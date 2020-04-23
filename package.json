@@ -1,0 +1,50 @@
+{
+  "name": "seinjs-platform-webpack-plugin",
+  "version": "0.8.6",
+  "description": "A webpack plugin for adapting multiply platforms for Sein.js.",
+  "author": {
+    "name": "dtysky",
+    "email": "dtysky@outlook.com"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "npm run build-main && npm run build-adapter",
+    "build-main": "babel src -d lib --presets=env --plugins=add-module-exports",
+    "build-adapter": "NODE_ENV=production rollup -c ./adapters/rollup.config.js",
+    "dev": "npm run build-main && npm run dev-adapter",
+    "dev-adapter": "rollup -c ./adapters/rollup.config.js -w",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "lib",
+    "readme.md",
+    "headers",
+    "alias",
+    "adapters/dist",
+    "LICENCE"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^9.0.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "concurrently": "^4.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "jest": "^23.5.0",
+    "rollup": "^0.65.2",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-cleanup": "^3.0.0",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-terser": "^5.1.1",
+    "rollup-watch": "^4.3.1"
+  }
+}
