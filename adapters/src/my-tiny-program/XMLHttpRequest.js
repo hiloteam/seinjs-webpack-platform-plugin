@@ -20,12 +20,19 @@ function _changeReadyState(readyState) {
 }
 
 export default class XMLHttpRequest {
+  static BIG_FILE_EXT = ['glb', 'bin', 'ktx', 'mp3', 'mp4', 'ogg'];
+  static BIG_FILE_STORE_PREFIX = 'SEIN_BIG_FILE';
+  static BIG_FILE_EXT_REGEX = new RegExp();
   // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
   static UNSEND = 0
   static OPENED = 1
   static HEADERS_RECEIVED = 2
   static LOADING = 3
   static DONE = 4
+
+  static RebuildBigFileExtRegex() {
+    XMLHttpRequest.BIG_FILE_EXT_REGEX = new RegExp(`(\.${XMLHttpRequest.BIG_FILE_EXT.join('|\.')})$`, 'g');
+  }
 
   /*
    * TODO 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
@@ -129,9 +136,33 @@ export default class XMLHttpRequest {
   }
 
   sendHTTPRequest(data) {
+    const origUrl = _url.get(this);
+    const [url, postFix] = origUrl.split('?');
+    XMLHttpRequest.BIG_FILE_EXT_REGEX.lastIndex = 0;
+
+    // is big file
+    if (XMLHttpRequest.BIG_FILE_EXT_REGEX.test(url)) {
+      my.getStorage({
+        key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`,
+        success: ({data}) => {
+          if (!data) {
+            this.downloadFile(url, data, postFix);
+            return;
+          }
+
+          _url.set(this, data);
+          this.sendLocalFileRequest(data);
+        },
+        fail: () => {
+          this.downloadFile(url, data, postFix);
+        }
+      });
+      return;
+    }
+
     my.request({
       data,
-      url: _url.get(this),
+      url,
       method: _method.get(this),
       header: _requestHeader.get(this),
       dataType: this.responseType || 'text',
@@ -174,6 +205,31 @@ export default class XMLHttpRequest {
     })
   }
 
+  downloadFile(url, data, postFix) {
+    const header = {};
+    if (postFix) {
+      const tmp = /length=(.+)/g.exec(postFix);
+
+      if (tmp && tmp[1]) {
+        header['content-length'] = parseInt(tmp[1], 10);
+      }
+    }
+
+    my.downloadFile({
+      url,
+      header: Object.assign(_requestHeader.get(this), header),
+      success: ({apFilePath}) => {
+        my.setStorage({key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`, data: apFilePath});
+        _url.set(this, apFilePath);
+        this.sendLocalFileRequest(data);
+      },
+      fail: (res) => {
+        _triggerEvent.call(this, 'error', res)
+        _triggerEvent.call(this, 'loadend')
+      }
+    })
+  }
+
   sendLocalFileRequest(data) {
     const fs = my.getFileSystemManager()
     let url = _url.get(this)
@@ -208,9 +264,8 @@ export default class XMLHttpRequest {
             break
         }
     
-        fs.readFile({
+        fs.readFile(Object.assign({
           filePath: url,
-          encoding,
           success: ({data}) => {
             try {
               if (dataType === 'json') {
@@ -245,7 +300,7 @@ export default class XMLHttpRequest {
             _triggerEvent.call(this, 'error', new Error(`Read file error: ${errorMessage}`))
             _triggerEvent.call(this, 'loadend')
           }
-        })
+        }, encoding && {encoding}))
       },
       fail: ({errorMessage}) => {
         console.error(`Read file error: ${errorMessage}`, 1);
@@ -262,3 +317,5 @@ export default class XMLHttpRequest {
     _requestHeader.set(this, myHeader)
   }
 }
+
+XMLHttpRequest.RebuildBigFileExtRegex();
