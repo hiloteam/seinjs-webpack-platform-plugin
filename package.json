@@ -1,6 +1,6 @@
 {
   "name": "seinjs-platform-webpack-plugin",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "description": "A webpack plugin for adapting multiply platforms for Sein.js.",
   "author": {
     "name": "dtysky",

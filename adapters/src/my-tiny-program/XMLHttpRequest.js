@@ -20,8 +20,8 @@ function _changeReadyState(readyState) {
 }
 
 export default class XMLHttpRequest {
-  static BIG_FILE_EXT = ['glb', 'bin', 'ktx', 'mp3', 'mp4', 'ogg'];
-  static BIG_FILE_STORE_PREFIX = 'SEIN_BIG_FILE';
+  static BIG_FILE_EXT = ['glb', 'bin', 'ktx', 'atlas'];
+  // static BIG_FILE_STORE_PREFIX = 'SEIN_BIG_FILE';
   static BIG_FILE_EXT_REGEX = new RegExp();
   // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
   static UNSEND = 0
@@ -142,21 +142,22 @@ export default class XMLHttpRequest {
 
     // is big file
     if (XMLHttpRequest.BIG_FILE_EXT_REGEX.test(url)) {
-      my.getStorage({
-        key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`,
-        success: ({data}) => {
-          if (!data) {
-            this.downloadFile(url, data, postFix);
-            return;
-          }
+      // my.getStorage({
+      //   key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`,
+      //   success: ({data}) => {
+      //     if (!data) {
+      //       this.downloadFile(url, data, postFix);
+      //       return;
+      //     }
 
-          _url.set(this, data);
-          this.sendLocalFileRequest(data);
-        },
-        fail: () => {
-          this.downloadFile(url, data, postFix);
-        }
-      });
+      //     _url.set(this, data);
+      //     this.sendLocalFileRequest(data);
+      //   },
+      //   fail: () => {
+      //     this.downloadFile(url, data, postFix);
+      //   }
+      // });
+      this.downloadFile(url, data, postFix);
       return;
     }
 
@@ -219,7 +220,7 @@ export default class XMLHttpRequest {
       url,
       header: Object.assign(_requestHeader.get(this), header),
       success: ({apFilePath}) => {
-        my.setStorage({key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`, data: apFilePath});
+        // my.setStorage({key: `${XMLHttpRequest.BIG_FILE_STORE_PREFIX}.${url}`, data: apFilePath});
         _url.set(this, apFilePath);
         this.sendLocalFileRequest(data);
       },
