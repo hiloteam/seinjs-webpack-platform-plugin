@@ -2,7 +2,7 @@ export function noop() { }
 
 export const DATA_URI = /^\s*data:(?:([\w-]+)\/([\w+.-]+))?(?:;charset=([\w-]+))?(?:;(base64))?,(.*)/i;
 
-export function initBase64() {
+export function initBase64(global) {
   let base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   let base64DecodeChars = new Array(
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -96,6 +96,9 @@ export function initBase64() {
     return out;
   }
 
-  my.window.atob = base64decode;
-  my.window.btoa = base64encode;
+  if (typeof my !== undefined) {
+    
+  }
+  global.window.atob = base64decode;
+  global.window.btoa = base64encode;
 }

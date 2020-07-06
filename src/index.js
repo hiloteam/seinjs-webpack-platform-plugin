@@ -12,7 +12,8 @@ import {isDev} from './utils';
 
 const ADAPTER_NAME = 'seinjs-adapter.js';
 const NEED_ADD_ADAPTER_REQUIRE = [
-  'my-tiny-program'
+  'my-tiny-program',
+  'wx-mini-program'
 ];
 
 export default class SeinJSPlatformPlugin {

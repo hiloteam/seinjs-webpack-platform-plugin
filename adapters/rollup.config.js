@@ -39,7 +39,9 @@ minifyPlugins.push(terser())
 
 export default [
   {name: 'my-tiny-program'},
-  {name: 'my-tiny-game'}
+  {name: 'my-tiny-game'},
+  {name: 'wx-mini-program'},
+  {name: 'wx-mini-game'}
 ].map(({name}) => ({
   input: path.resolve(__dirname, `./src/${name}/index.js`),
 
