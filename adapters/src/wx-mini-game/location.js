@@ -1,6 +1,10 @@
 const location = {
   href: 'game.js',
 
+  origin: '',
+
+  pathname: '',
+
   reload() {
   },
 
